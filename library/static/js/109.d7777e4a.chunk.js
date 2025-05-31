@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkyatraadmin=self.webpackChunkyatraadmin||[]).push([[109],{3109:(a,e,t)=>{t.r(e),t.d(e,{default:()=>f});var r=t(9950),s=t(8429),n=t(3313),c=t(3497),u=t(4414);const f=()=>{const a=(0,n.j)();return(0,r.useEffect)((()=>{a((0,c.ri)())}),[a]),(0,u.jsx)(s.C5,{to:"/login",replace:!0})}}}]);
