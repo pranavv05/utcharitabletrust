@@ -97,6 +97,14 @@ require('./config.php')
             animation: spin 2s linear infinite;
             margin: auto;
         }
+        /* Search input button spacing */
+        .search-box .input-group .btn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        .search-box .input-group .btn + .btn {
+            margin-left: 4px;
+        }
         @-webkit-keyframes spin {
           0% { -webkit-transform: rotate(0deg); }
           100% { -webkit-transform: rotate(360deg); }
@@ -105,6 +113,21 @@ require('./config.php')
         @keyframes spin {
           0% { transform: rotate(0deg); }
           100% { transform: rotate(360deg); }
+        }
+        /* Table and badge styling improvements */
+        .book-table tbody tr td, .book-table tbody tr th {
+            vertical-align: middle;
+        }
+        .class-badge, .badge-primary {
+            background-color: #034D6E;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 767px) {
+            .filter-section .form-group { margin-bottom: 12px; }
+            .book-table thead th:nth-child(2), .book-table tbody td:nth-child(2) { display: none; }
         }
     </style>
 
@@ -179,13 +202,18 @@ require('./config.php')
                         <div class="col-md-4">
                             <div class="form-group search-box">
                                 <label for="searchInput">Search:</label>
-                                <input type="text" class="form-control" id="searchInput" placeholder="Search by book name, author, etc.">
-                                <span class="search-icon"><i class="fa fa-search"></i></span>
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="searchInput" placeholder="Search by book name, author, UTBN or class" aria-label="Search books">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" type="button" id="searchBtn" title="Search"><i class="fa fa-search"></i></button>
+                                        <button class="btn btn-light" type="button" id="clearSearch" title="Clear"><i class="fa fa-times"></i></button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-md-2">
                             <div class="form-group" style="margin-top: 32px;">
-                                <button id="resetFilters" class="reset-btn"><i class="fa fa-refresh"></i> Reset</button>
+                                <button id="resetFilters" class="btn btn-secondary"><i class="fa fa-refresh"></i> Reset</button>
                             </div>
                         </div>
                     </div>
@@ -196,14 +224,15 @@ require('./config.php')
                 
                 <!-- Table of books -->
                 <div class="table-responsive">
-                    <table class="table table-bordered book-table" id="bookTable">
+                    <table class="table table-bordered table-striped table-hover book-table" id="bookTable">
                         <thead>
                             <tr>
                                 <th scope="col" width="5%">ID</th>
-                                <th scope="col" width="35%" data-sort="book_name">Book Name <i class="fa fa-sort sort-icon"></i></th>
-                                <th scope="col" width="25%" data-sort="author">Author <i class="fa fa-sort sort-icon"></i></th>
-                                <th scope="col" width="15%" data-sort="class">Class <i class="fa fa-sort sort-icon"></i></th>
-                                <th scope="col" width="20%">ISBN No.</th>
+                                <th scope="col" width="10%">Cover</th>
+                                <th scope="col" width="35%" data-sort="bookName">Book Name <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="20%" data-sort="author">Author <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="10%" data-sort="class">Class <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="20%">UTBN No.</th>
                             </tr>
                         </thead>
                         <tbody id="bookTableBody">
@@ -277,12 +306,24 @@ require('./config.php')
                             $('#bookTable').show();
                             let index = (response.pagination.current_page - 1) * 50 + 1;
                             response.books.forEach(function(book) {
+                                // Safely pick fields and provide fallbacks
+                                const bookName = book.bookName || book.book_name || '-';
+                                const author = book.author || '-';
+                                const className = book.class || '-';
+                                // In DB the column is likely `utbn` per schema screenshot. Try common keys.
+                                const utbn = book.utbn || book['utbn no'] || book['utbn_no'] || '-';
+                                // Book cover (if present) -- fallback to placeholder
+                                const cover = book.bookImage || book.bookimage || book.book_image || '';
+                                const coverHtml = cover ? `<img src="assets/images/stationary/${cover}" alt="cover" style="height:48px; width:auto; object-fit:cover; border-radius:4px;">` : `<div style="height:48px; width:36px; background:#eee; display:inline-block; border-radius:4px;
+                                    text-align:center; line-height:48px; color:#999; font-size:12px;">No</div>`;
+
                                 const row = `<tr>
                                     <th scope="row">${index++}</th>
-                                    <td>${book.book_name}</td>
-                                    <td>${book.author}</td>
-                                    <td><span class="class-badge">${book.class}</span></td>
-                                    <td>${book.isbn}</td>
+                                    <td class="text-center">${coverHtml}</td>
+                                    <td>${bookName}</td>
+                                    <td>${author}</td>
+                                    <td><span class="badge badge-primary">${className}</span></td>
+                                    <td>${utbn}</td>
                                 </tr>`;
                                 tableBody.append(row);
                             });
@@ -348,12 +389,38 @@ require('./config.php')
                 loadBooks();
             });
 
-            $('#searchInput').on('keyup', function() {
+            // Debounced typing search
+            $('#searchInput').on('input', function() {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(function() {
                     currentPage = 1;
                     loadBooks();
                 }, 300); // Debounce for 300ms
+            });
+
+            // Pressing Enter triggers immediate search
+            $('#searchInput').on('keydown', function(e) {
+                if (e.key === 'Enter' || e.keyCode === 13) {
+                    e.preventDefault();
+                    clearTimeout(searchTimeout);
+                    currentPage = 1;
+                    loadBooks();
+                }
+            });
+
+            // Search button click
+            $('#searchBtn').on('click', function() {
+                clearTimeout(searchTimeout);
+                currentPage = 1;
+                loadBooks();
+            });
+
+            // Clear search input
+            $('#clearSearch').on('click', function() {
+                $('#searchInput').val('');
+                clearTimeout(searchTimeout);
+                currentPage = 1;
+                loadBooks();
             });
 
             $('#resetFilters').on('click', function() {
