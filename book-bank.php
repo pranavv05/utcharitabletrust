@@ -57,103 +57,56 @@ require('./config.php')
             margin-bottom: 20px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .filter-section .form-group {
-            margin-bottom: 15px;
+        .book-table thead th {
+            cursor: pointer;
         }
-        
-        .book-table {
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        .book-table thead th .sort-icon {
+            margin-left: 5px;
+            color: #ddd;
         }
-        
-        .book-table thead {
-            background-color: #034D6E;
+        .book-table thead th.sorted-asc .sort-icon,
+        .book-table thead th.sorted-desc .sort-icon {
             color: white;
         }
-        
-        .table-responsive {
-            overflow-x: auto;
+        .pagination-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
         }
-        
-        .no-results {
-            padding: 30px;
+        .pagination .page-item .page-link {
+            color: #034D6E;
+        }
+        .pagination .page-item.active .page-link {
+            background-color: #034D6E;
+            border-color: #034D6E;
+            color: white;
+        }
+        .loader-container {
+            display: none;
             text-align: center;
-            background: #f9f9f9;
+            padding: 50px;
         }
-        
-        .class-badge {
-            display: inline-block;
-            padding: 5px 10px;
-            background-color: #034D6E;
-            color: white;
-            border-radius: 4px;
-            font-size: 12px;
+        .loader {
+            border: 8px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 8px solid #034D6E;
+            width: 60px;
+            height: 60px;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+            margin: auto;
         }
-        
-        .book-count {
-            font-weight: bold;
-            margin-bottom: 10px;
+        @-webkit-keyframes spin {
+          0% { -webkit-transform: rotate(0deg); }
+          100% { -webkit-transform: rotate(360deg); }
         }
-        
-        .search-box {
-            position: relative;
-        }
-        
-        .search-box .form-control {
-            padding-right: 40px;
-        }
-        
-        .search-box .search-icon {
-            position: absolute;
-            right: 15px;
-            top: 10px;
-            color: #666;
-        }
-        
-        .filter-btn {
-            background-color: #034D6E;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .filter-btn:hover {
-            background-color: #023D5E;
-        }
-        
-        .reset-btn {
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .reset-btn:hover {
-            background-color: #5a6268;
-        }
-        
-        @media (max-width: 768px) {
-            .filter-row .col-md-3 {
-                margin-bottom: 10px;
-            }
-            
-            .table-responsive {
-                margin-top: 15px;
-            }
+
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
         }
     </style>
-
-    <!-- Fixing Internet Explorer-->
-    <!--[if lt IE 9]>
-        <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-        <script src="assets/js/html5shiv.js"></script>
-    <![endif]-->
 
 </head>
 
@@ -161,14 +114,6 @@ require('./config.php')
 
     <div class="boxed_wrapper ltr">
 
-        <!-- Preloader -->
-        <div class="loader-wrap">
-            <div class="layer layer-one"><span class="overlay"></span></div>
-            <div class="layer layer-two"><span class="overlay"></span></div>
-            <div class="layer layer-three"><span class="overlay"></span></div>
-        </div>
-
-        <!-- Main header-->
         <?php include('header.php'); ?>
 
         <!--Start breadcrumb area-->
@@ -177,20 +122,6 @@ require('./config.php')
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="inner-content text-center">
-                            <div class="parallax-scene parallax-scene-1">
-                                <div data-depth="0.20" class="parallax-layer shape wow zoomInRight" data-wow-duration="2000ms">
-                                    <div class="shape1">
-                                        <img class="float-bob" src="assets/images/shape/breadcrumb-shape1.png" alt="">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="parallax-scene parallax-scene-1">
-                                <div data-depth="0.20" class="parallax-layer shape wow zoomInRight" data-wow-duration="2000ms">
-                                    <div class="shape2">
-                                        <img class="zoominout" src="assets/images/shape/breadcrumb-shape2.png" alt="">
-                                    </div>
-                                </div>
-                            </div>
                             <div class="title">
                                 <h2>Book Bank</h2>
                             </div>
@@ -209,31 +140,8 @@ require('./config.php')
         </section>
         <!--End breadcrumb area-->
 
-        <!--Start Causes Gallery Area-->
-        <section class="causes-gallery-area">
-            <div class="container">
-                <div class="sec-title text-center">
-                    <div class="sub-title">
-                        <div class="inner">
-                            <h3>We Change Your Life &amp; World</h3>
-                        </div>
-                        <div class="outer"><img src="assets/images/icon/loveicon.png" alt=""></div>
-                    </div>
-                    <h2>Book Bank</h2>
-                </div>
-                <!--Start Blog Details Text 2-->
-                <div class="blog-details-text-2" style="padding-bottom: 30px;">
-                    <p class="justify-text-center">More Than 400 students use the Book Bank, which is sponsored by the UT Charitable Trust. Many students may find it difficult to access educational resources, but we work to change that. With the help of our Book Bank programme, students can access textbooks and study resources for Standard 9 through Standard 12, JEE, NEET, CS, and CA. Join us in supporting students and assisting them in achieving their academic objectives.</p>
-                    <p class="justify-text-center">The following group of needy pupils receives the books when they are returned at the end of the school year.</p>
-                    <p class="justify-text-center">There is also scope for expanding the reach of the book bank to a larger number of needy students.</p>
-                </div>
-                <!--End Blog Details Text 2-->
-            </div>
-        </section>
-        <!--End Causes Gallery Area-->
-
         <!--Book List Area-->
-        <section class="causes-gallery-area" style="padding-top: 0px;margin-top: -30px;">
+        <section class="causes-gallery-area" style="padding-top: 50px;">
             <div class="container">
                 <h2 class="text-center mb-4">Book Collection</h2>
                 
@@ -246,10 +154,9 @@ require('./config.php')
                                 <select class="form-control" id="classFilter">
                                     <option value="">All Classes</option>
                                     <?php
-                                    // Get unique classes from the database
                                     $classQuery = mysqli_query($con, "SELECT DISTINCT class FROM book_lists WHERE status = 'active' ORDER BY class");
                                     while ($classRow = mysqli_fetch_assoc($classQuery)) {
-                                        echo '<option value="' . $classRow['class'] . '">' . $classRow['class'] . '</option>';
+                                        echo '<option value="' . htmlspecialchars($classRow['class']) . '">' . htmlspecialchars($classRow['class']) . '</option>';
                                     }
                                     ?>
                                 </select>
@@ -261,10 +168,9 @@ require('./config.php')
                                 <select class="form-control" id="authorFilter">
                                     <option value="">All Authors</option>
                                     <?php
-                                    // Get unique authors from the database
                                     $authorQuery = mysqli_query($con, "SELECT DISTINCT author FROM book_lists WHERE status = 'active' ORDER BY author");
                                     while ($authorRow = mysqli_fetch_assoc($authorQuery)) {
-                                        echo '<option value="' . $authorRow['author'] . '">' . $authorRow['author'] . '</option>';
+                                        echo '<option value="' . htmlspecialchars($authorRow['author']) . '">' . htmlspecialchars($authorRow['author']) . '</option>';
                                     }
                                     ?>
                                 </select>
@@ -294,47 +200,37 @@ require('./config.php')
                         <thead>
                             <tr>
                                 <th scope="col" width="5%">ID</th>
-                                <th scope="col" width="35%">Book Name</th>
-                                <th scope="col" width="25%">Author</th>
-                                <th scope="col" width="15%">Class</th>
+                                <th scope="col" width="35%" data-sort="book_name">Book Name <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="25%" data-sort="author">Author <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="15%" data-sort="class">Class <i class="fa fa-sort sort-icon"></i></th>
                                 <th scope="col" width="20%">ISBN No.</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <?php
-                            $query = mysqli_query($con, "SELECT * FROM book_lists WHERE status = 'active' ORDER BY class, book_name");
-                            $index = 0;
-                            $rowcount = mysqli_num_rows($query);
-                            if ($rowcount > 0) {
-                                while ($row = mysqli_fetch_assoc($query)) {
-                                    $index++;
-                            ?>
-                                    <tr data-class="<?php echo $row['class']; ?>" data-author="<?php echo $row['author']; ?>">
-                                        <th scope="row"><?php echo $index; ?></th>
-                                        <td><?php echo $row['book_name']; ?></td>
-                                        <td><?php echo $row['author']; ?></td>
-                                        <td><span class="class-badge"><?php echo $row['class']; ?></span></td>
-                                        <td><?php echo $row['isbn']; ?></td>
-                                    </tr>
-                            <?php  }
-                            }
-                            ?>
+                        <tbody id="bookTableBody">
+                            <!-- Book rows will be inserted here by JavaScript -->
                         </tbody>
                     </table>
                     
+                    <!-- Loader -->
+                    <div class="loader-container" id="loader">
+                        <div class="loader"></div>
+                        <p>Loading Books...</p>
+                    </div>
+
                     <!-- No results message -->
                     <div id="noResults" class="no-results" style="display: none;">
                         <h5>No books match your search criteria</h5>
                         <p>Try adjusting your filters or search term</p>
                     </div>
                 </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container" id="pagination"></div>
             </div>
         </section>
         <!--End Book List Area-->
 
-        <!--Start footer area -->
         <?php include('footer.php'); ?>
-        <!--End footer area-->
 
         <button class="scroll-top scroll-to-target" data-target="html">
             <span class="fa fa-angle-up"></span>
@@ -343,106 +239,154 @@ require('./config.php')
     </div>
 
     <script src="assets/js/jquery.js"></script>
-    <script src="assets/js/aos.js"></script>
-    <script src="assets/js/appear.js"></script>
     <script src="assets/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/bootstrap-select.min.js"></script>
-    <script src="assets/js/isotope.js"></script>
-    <script src="assets/js/jquery.bxslider.min.js"></script>
-    <script src="assets/js/jquery.countdown.min.js"></script>
-    <script src="assets/js/jquery.countTo.js"></script>
-    <script src="assets/js/jquery.easing.min.js"></script>
-    <script src="assets/js/jquery.enllax.min.js"></script>
-    <script src="assets/js/jquery.fancybox.js"></script>
-    <script src="assets/js/jquery.magnific-popup.min.js"></script>
-    <script src="assets/js/jquery.paroller.min.js"></script>
-    <script src="assets/js/jquery.polyglot.language.switcher.js"></script>
-    <script src="assets/js/jQuery.style.switcher.min.js"></script>
-    <script src="assets/js/jquery-ui.js"></script>
-    <script src="assets/js/knob.js"></script>
-    <script src="assets/js/map-script.js"></script>
-    <script src="assets/js/owl.js"></script>
-    <script src="assets/js/pagenav.js"></script>
-    <script src="assets/js/parallax.min.js"></script>
-    <script src="assets/js/scrollbar.js"></script>
-    <script src="assets/js/slick.js"></script>
-    <script src="assets/js/timePicker.js"></script>
-    <script src="assets/js/validation.js"></script>
-    <script src="assets/js/wow.js"></script>
-    <script src="assets/js/TweenMax.min.js"></script>
-    <script src="assets/js/jquery-sidebar-content.js"></script>
-    <!-- thm custom script -->
-    <script src="assets/js/custom.js"></script>
+    <!-- Add other necessary JS files here if needed -->
     
-    <!-- Book filtering script -->
     <script>
         $(document).ready(function() {
-            // Update book count
-            function updateBookCount() {
-                var visibleRows = $('#bookTable tbody tr:visible').length;
-                $('#bookCount').text('Showing ' + visibleRows + ' of ' + $('#bookTable tbody tr').length + ' books');
-                
-                // Show/hide no results message
-                if (visibleRows === 0) {
-                    $('#noResults').show();
-                    $('#bookTable').hide();
-                } else {
-                    $('#noResults').hide();
-                    $('#bookTable').show();
-                }
-            }
-            
-            // Initialize book count
-            updateBookCount();
-            
-            // Filter function
-            function filterBooks() {
-                var classFilter = $('#classFilter').val().toLowerCase();
-                var authorFilter = $('#authorFilter').val().toLowerCase();
-                var searchTerm = $('#searchInput').val().toLowerCase();
-                
-                $('#bookTable tbody tr').each(function() {
-                    var $row = $(this);
-                    var bookClass = $row.data('class').toLowerCase();
-                    var bookAuthor = $row.data('author').toLowerCase();
-                    var bookName = $row.find('td:eq(0)').text().toLowerCase();
-                    var bookIsbn = $row.find('td:eq(3)').text().toLowerCase();
-                    
-                    // Check if row matches all filters
-                    var classMatch = classFilter === '' || bookClass === classFilter;
-                    var authorMatch = authorFilter === '' || bookAuthor === authorFilter;
-                    var searchMatch = searchTerm === '' || 
-                                      bookName.includes(searchTerm) || 
-                                      bookAuthor.includes(searchTerm) || 
-                                      bookClass.includes(searchTerm) || 
-                                      bookIsbn.includes(searchTerm);
-                    
-                    if (classMatch && authorMatch && searchMatch) {
-                        $row.show();
-                    } else {
-                        $row.hide();
+            let currentPage = 1;
+            let currentSort = 'class';
+            let currentSortDir = 'asc';
+            let searchTimeout;
+
+            function loadBooks() {
+                $('#loader').show();
+                $('#bookTable').hide();
+                $('#noResults').hide();
+
+                const params = {
+                    page: currentPage,
+                    class: $('#classFilter').val(),
+                    author: $('#authorFilter').val(),
+                    search: $('#searchInput').val(),
+                    sort_by: currentSort,
+                    sort_dir: currentSortDir
+                };
+
+                $.ajax({
+                    url: 'fetch_books.php',
+                    type: 'GET',
+                    data: params,
+                    dataType: 'json',
+                    success: function(response) {
+                        $('#loader').hide();
+                        const tableBody = $('#bookTableBody');
+                        tableBody.empty();
+
+                        if (response.books && response.books.length > 0) {
+                            $('#bookTable').show();
+                            let index = (response.pagination.current_page - 1) * 50 + 1;
+                            response.books.forEach(function(book) {
+                                const row = `<tr>
+                                    <th scope="row">${index++}</th>
+                                    <td>${book.book_name}</td>
+                                    <td>${book.author}</td>
+                                    <td><span class="class-badge">${book.class}</span></td>
+                                    <td>${book.isbn}</td>
+                                </tr>`;
+                                tableBody.append(row);
+                            });
+                        } else {
+                            $('#noResults').show();
+                        }
+
+                        updateBookCount(response.pagination);
+                        updatePagination(response.pagination);
+                        updateSortIcons();
+                    },
+                    error: function() {
+                        $('#loader').hide();
+                        $('#noResults').show().find('h5').text('An error occurred while fetching data.');
                     }
                 });
+            }
+
+            function updateBookCount(pagination) {
+                if (pagination.total_records > 0) {
+                    $('#bookCount').text(`Showing ${((pagination.current_page - 1) * 50) + 1} - ${Math.min(pagination.current_page * 50, pagination.total_records)} of ${pagination.total_records} books`);
+                } else {
+                    $('#bookCount').text('No books found');
+                }
+            }
+
+            function updatePagination(pagination) {
+                const paginationContainer = $('#pagination');
+                paginationContainer.empty();
+                if (pagination.total_pages <= 1) return;
+
+                let paginationHTML = '<ul class="pagination">';
                 
-                // Update book count after filtering
-                updateBookCount();
+                // Previous button
+                paginationHTML += `<li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${pagination.current_page - 1}">Previous</a></li>`;
+
+                // Page numbers
+                for (let i = 1; i <= pagination.total_pages; i++) {
+                    paginationHTML += `<li class="page-item ${i === pagination.current_page ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                }
+
+                // Next button
+                paginationHTML += `<li class="page-item ${pagination.current_page === pagination.total_pages ? 'disabled' : ''}">
+                    <a class="page-link" href="#" data-page="${pagination.current_page + 1}">Next</a></li>`;
+
+                paginationHTML += '</ul>';
+                paginationContainer.html(paginationHTML);
             }
             
-            // Event listeners for filters
-            $('#classFilter, #authorFilter').on('change', filterBooks);
-            $('#searchInput').on('keyup', filterBooks);
-            
-            // Reset filters
-            $('#resetFilters').on('click', function() {
-                $('#classFilter').val('');
-                $('#authorFilter').val('');
-                $('#searchInput').val('');
-                $('#bookTable tbody tr').show();
-                updateBookCount();
+            function updateSortIcons() {
+                $('.sort-icon').removeClass('fa-sort-asc fa-sort-desc').addClass('fa-sort');
+                $(`th[data-sort='${currentSort}'] .sort-icon`)
+                    .removeClass('fa-sort')
+                    .addClass(currentSortDir === 'asc' ? 'fa-sort-asc' : 'fa-sort-desc');
+            }
+
+            // --- Event Handlers ---
+
+            $('#classFilter, #authorFilter').on('change', function() {
+                currentPage = 1;
+                loadBooks();
             });
+
+            $('#searchInput').on('keyup', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(function() {
+                    currentPage = 1;
+                    loadBooks();
+                }, 300); // Debounce for 300ms
+            });
+
+            $('#resetFilters').on('click', function() {
+                $('#classFilter, #authorFilter, #searchInput').val('');
+                currentPage = 1;
+                loadBooks();
+            });
+
+            $('#pagination').on('click', '.page-link', function(e) {
+                e.preventDefault();
+                const page = $(this).data('page');
+                if (page) {
+                    currentPage = page;
+                    loadBooks();
+                }
+            });
+            
+            $('.book-table thead').on('click', 'th[data-sort]', function() {
+                const newSort = $(this).data('sort');
+                if (newSort === currentSort) {
+                    currentSortDir = currentSortDir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort = newSort;
+                    currentSortDir = 'asc';
+                }
+                currentPage = 1;
+                loadBooks();
+            });
+
+            // Initial load
+            loadBooks();
         });
     </script>
 
 </body>
-
 </html>
