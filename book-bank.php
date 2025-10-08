@@ -118,7 +118,7 @@ require('./config.php')
         .book-table tbody tr td, .book-table tbody tr th {
             vertical-align: middle;
         }
-        .class-badge, .badge-primary {
+        .badge-primary {
             background-color: #034D6E;
             color: #fff;
             padding: 4px 8px;
@@ -127,8 +127,14 @@ require('./config.php')
         }
         @media (max-width: 767px) {
             .filter-section .form-group { margin-bottom: 12px; }
-            .book-table thead th:nth-child(2), .book-table tbody td:nth-child(2) { display: none; }
         }
+        /* Pagination styling */
+        #pagination { padding: 12px 0; }
+        #pagination .pagination { margin: 0; }
+        #pagination .page-item .page-link { color: #034D6E; border-radius: 4px; padding: 6px 10px; }
+        #pagination .page-item.active .page-link { background: #034D6E; color: #fff; border-color: #034D6E; }
+        #pagination .page-item.disabled .page-link { color: #bfc9ce; pointer-events: none; }
+        #pagination .page-item { margin-right: 6px; }
     </style>
 
 </head>
@@ -228,10 +234,9 @@ require('./config.php')
                         <thead>
                             <tr>
                                 <th scope="col" width="5%">ID</th>
-                                <th scope="col" width="10%">Cover</th>
                                 <th scope="col" width="35%" data-sort="bookName">Book Name <i class="fa fa-sort sort-icon"></i></th>
-                                <th scope="col" width="20%" data-sort="author">Author <i class="fa fa-sort sort-icon"></i></th>
-                                <th scope="col" width="10%" data-sort="class">Class <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="25%" data-sort="author">Author <i class="fa fa-sort sort-icon"></i></th>
+                                <th scope="col" width="15%" data-sort="class">Class <i class="fa fa-sort sort-icon"></i></th>
                                 <th scope="col" width="20%">UTBN No.</th>
                             </tr>
                         </thead>
@@ -312,14 +317,8 @@ require('./config.php')
                                 const className = book.class || '-';
                                 // In DB the column is likely `utbn` per schema screenshot. Try common keys.
                                 const utbn = book.utbn || book['utbn no'] || book['utbn_no'] || '-';
-                                // Book cover (if present) -- fallback to placeholder
-                                const cover = book.bookImage || book.bookimage || book.book_image || '';
-                                const coverHtml = cover ? `<img src="assets/images/stationary/${cover}" alt="cover" style="height:48px; width:auto; object-fit:cover; border-radius:4px;">` : `<div style="height:48px; width:36px; background:#eee; display:inline-block; border-radius:4px;
-                                    text-align:center; line-height:48px; color:#999; font-size:12px;">No</div>`;
-
                                 const row = `<tr>
                                     <th scope="row">${index++}</th>
-                                    <td class="text-center">${coverHtml}</td>
                                     <td>${bookName}</td>
                                     <td>${author}</td>
                                     <td><span class="badge badge-primary">${className}</span></td>
@@ -353,23 +352,52 @@ require('./config.php')
             function updatePagination(pagination) {
                 const paginationContainer = $('#pagination');
                 paginationContainer.empty();
-                if (pagination.total_pages <= 1) return;
+                const total = pagination.total_pages;
+                const current = pagination.current_page;
+                if (total <= 1) return;
 
-                let paginationHTML = '<ul class="pagination">';
-                
-                // Previous button
-                paginationHTML += `<li class="page-item ${pagination.current_page === 1 ? 'disabled' : ''}">
-                    <a class="page-link" href="#" data-page="${pagination.current_page - 1}">Previous</a></li>`;
-
-                // Page numbers
-                for (let i = 1; i <= pagination.total_pages; i++) {
-                    paginationHTML += `<li class="page-item ${i === pagination.current_page ? 'active' : ''}">
-                        <a class="page-link" href="#" data-page="${i}">${i}</a></li>`;
+                // helper to add a page item
+                function pageItem(page, label, disabled, active) {
+                    const cls = `page-item ${disabled ? 'disabled' : ''} ${active ? 'active' : ''}`;
+                    return `<li class="${cls}"><a class="page-link" href="#" data-page="${page}" aria-label="Go to page ${page}">${label}</a></li>`;
                 }
 
-                // Next button
-                paginationHTML += `<li class="page-item ${pagination.current_page === pagination.total_pages ? 'disabled' : ''}">
-                    <a class="page-link" href="#" data-page="${pagination.current_page + 1}">Next</a></li>`;
+                let paginationHTML = '<ul class="pagination">';
+
+                // First and Prev
+                paginationHTML += pageItem(1, '&laquo;', current === 1, false);
+                paginationHTML += pageItem(Math.max(1, current - 1), 'Prev', current === 1, false);
+
+                // Windowed page numbers (show up to 5 around current)
+                const delta = 2; // show current +/- delta
+                let start = Math.max(1, current - delta);
+                let end = Math.min(total, current + delta);
+
+                // Adjust if near the boundaries
+                if (current - start < delta) {
+                    end = Math.min(total, end + (delta - (current - start)));
+                }
+                if (end - current < delta) {
+                    start = Math.max(1, start - (delta - (end - current)));
+                }
+
+                if (start > 1) {
+                    paginationHTML += pageItem(1, '1', false, false);
+                    if (start > 2) paginationHTML += '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+                }
+
+                for (let i = start; i <= end; i++) {
+                    paginationHTML += pageItem(i, i, false, i === current);
+                }
+
+                if (end < total) {
+                    if (end < total - 1) paginationHTML += '<li class="page-item disabled"><span class="page-link">&hellip;</span></li>';
+                    paginationHTML += pageItem(total, total, false, false);
+                }
+
+                // Next and Last
+                paginationHTML += pageItem(Math.min(total, current + 1), 'Next', current === total, false);
+                paginationHTML += pageItem(total, '&raquo;', current === total, false);
 
                 paginationHTML += '</ul>';
                 paginationContainer.html(paginationHTML);
