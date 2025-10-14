@@ -8,8 +8,8 @@ $records_per_page = 50;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $records_per_page;
 
-// Base query
-$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM book_lists WHERE status = 'active'";
+// Base query - select explicit columns so keys are predictable in JSON
+$sql = "SELECT SQL_CALC_FOUND_ROWS id, bookName, author, class, `utbn` FROM book_lists WHERE status = 'active'";
 $params = [];
 $types = '';
 
@@ -31,7 +31,8 @@ if (!empty($_GET['author'])) {
 // Filter by search term
 if (!empty($_GET['search'])) {
     $searchTerm = '%' . $_GET['search'] . '%';
-    $sql .= " AND (bookName LIKE ? OR author LIKE ? OR class LIKE ? OR `utbn no` LIKE ?)";
+    // Use explicit column names; DB column appears to be `utbn` per schema
+    $sql .= " AND (bookName LIKE ? OR author LIKE ? OR class LIKE ? OR `utbn` LIKE ? )";
     // Add the search term for each placeholder
     for ($i = 0; $i < 4; $i++) {
         $params[] = $searchTerm;
@@ -63,6 +64,7 @@ $stmt = mysqli_prepare($con, $sql);
 if ($stmt) {
     if (!empty($params)) {
         // mysqli_stmt_bind_param requires variables to be passed by reference
+        $bind_names = array();
         $bind_names[] = $types;
         for ($i = 0; $i < count($params); $i++) {
             $bind_name = 'bind' . $i;
