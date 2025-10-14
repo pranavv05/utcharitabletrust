@@ -30,13 +30,27 @@ if (!empty($_GET['author'])) {
 
 // Filter by search term
 if (!empty($_GET['search'])) {
-    $searchTerm = '%' . $_GET['search'] . '%';
-    // Use explicit column names; DB column appears to be `utbn` per schema
-    $sql .= " AND (bookName LIKE ? OR author LIKE ? OR class LIKE ? OR `utbn` LIKE ? )";
-    // Add the search term for each placeholder
-    for ($i = 0; $i < 4; $i++) {
-        $params[] = $searchTerm;
+    $rawSearch = trim($_GET['search']);
+    $searchTerm = '%' . $rawSearch . '%';
+
+    // If the search is digits-only, treat UTBN as an exact match to avoid partial numeric matches (e.g. '97' matching '2097')
+    if (preg_match('/^\d+$/', $rawSearch)) {
+        $sql .= " AND (bookName LIKE ? OR author LIKE ? OR class LIKE ? OR `utbn` = ? )";
+        $params[] = $searchTerm; // bookName
         $types .= 's';
+        $params[] = $searchTerm; // author
+        $types .= 's';
+        $params[] = $searchTerm; // class
+        $types .= 's';
+        $params[] = $rawSearch; // exact utbn match
+        $types .= 's';
+    } else {
+        // Text search: partial matches for all fields
+        $sql .= " AND (bookName LIKE ? OR author LIKE ? OR class LIKE ? OR `utbn` LIKE ? )";
+        for ($i = 0; $i < 4; $i++) {
+            $params[] = $searchTerm;
+            $types .= 's';
+        }
     }
 }
 
